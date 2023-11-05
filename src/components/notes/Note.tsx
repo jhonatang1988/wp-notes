@@ -1,7 +1,7 @@
 import type { notes as Note } from "@prisma/client";
 import { useState } from "react";
 
-export default function Note({ note }: { note: Note }) {
+export default function Note({ note, baseNoteUrl }: { note: Note, baseNoteUrl: string }) {
   const [toggle, setToggle] = useState(false);
 
   const EditNote = () => (
@@ -15,6 +15,7 @@ export default function Note({ note }: { note: Note }) {
   return (
     <div>
       <h3>Note editor</h3>
+      <a href={`${baseNoteUrl}/all`}>All Notes</a>
       <div>
         {note.text ? (
           <>

@@ -13,6 +13,7 @@
     "@astrojs/check": "^0.3.1",
     "@astrojs/node": "^6.0.3",
     "@astrojs/react": "^3.0.4",
+    "@astrojs/vercel": "^5.1.0",
     "@prisma/client": "^5.5.2",
     "@types/react": "^18.2.35",
     "@types/react-dom": "^18.2.14",
@@ -21,9 +22,10 @@
     "react-dom": "^18.2.0",
     "typescript": "^5.2.2",
     "uuid": "^9.0.1",
-    "wp-user-client2": "^1.1.4"
+    "wp-user-client2": "^1.1.7"
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.6",
     "prisma": "^5.5.2"
   }
 }

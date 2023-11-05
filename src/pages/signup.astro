@@ -3,7 +3,7 @@ import WpUserClient from "wp-user-client2";
 import Layout from "../layouts/Layout.astro";
 import SignupComp from "../components/Signup";
 
-const wpUserClient = new WpUserClient({ env: "dev" });
+const wpUserClient = new WpUserClient({ env: "prod" });
 
 let error: string | null = null;
 

@@ -3,7 +3,7 @@ import LoginComp from "../components/Login";
 import Layout from "../layouts/Layout.astro";
 import WpUserClient from "wp-user-client2";
 
-const wpUserClient = new WpUserClient({ env: "dev" });
+const wpUserClient = new WpUserClient({ env: "prod" });
 const method = Astro.request.method;
 let error = null,
   userId: string | null = null;

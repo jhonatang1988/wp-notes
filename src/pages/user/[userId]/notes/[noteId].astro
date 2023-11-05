@@ -5,7 +5,7 @@ import AllNotes from "../../../../components/notes/All";
 import NoteComp from "../../../../components/notes/Note";
 import { v4 as uuidv4 } from "uuid";
 
-const wpUserClient = new WpUserClient({ env: "dev" });
+const wpUserClient = new WpUserClient({ env: "prod" });
 const token = Astro.cookies.get("jwt")?.value;
 let notes: Note[] = [],
   baseNoteUrl = "";
@@ -106,4 +106,4 @@ if (noteId === "all") {
     <AllNotes notes={notes} baseNoteUrl={baseNoteUrl} />
   )
 }
-{noteId !== "all" && note && <NoteComp client:only='react' note={note} />}
+{noteId !== "all" && note && <NoteComp client:only='react' note={note} baseNoteUrl={baseNoteUrl} />}
