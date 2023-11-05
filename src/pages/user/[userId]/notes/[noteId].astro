@@ -1,0 +1,109 @@
+---
+import WpUserClient from "wp-user-client2";
+import { PrismaClient, type notes as Note } from "@prisma/client";
+import AllNotes from "../../../../components/notes/All";
+import NoteComp from "../../../../components/notes/Note";
+import { v4 as uuidv4 } from "uuid";
+
+const wpUserClient = new WpUserClient({ env: "dev" });
+const token = Astro.cookies.get("jwt")?.value;
+let notes: Note[] = [],
+  baseNoteUrl = "";
+
+if (!token) {
+  return Astro.redirect("/login");
+}
+
+const onTime = wpUserClient.checkExpiry(token);
+
+if (!onTime) {
+  return Astro.redirect("/login");
+}
+
+const { userId, noteId } = Astro.params;
+
+if (!userId || !noteId) {
+  return Astro.redirect("/login");
+}
+
+const prisma = new PrismaClient();
+
+if (Astro.request.method === "POST") {
+  const formData = await Astro.request.formData();
+  const text = formData.get("text");
+  const noteId = formData.get("noteId");
+  // TODO: use htmx to send delete request
+  const deleteMethod = formData.get("deleteMethod");
+
+  if (deleteMethod && noteId) {
+    const noteRes = await prisma.notes.delete({
+      where: {
+        noteId: noteId.toString(),
+      },
+    });
+
+    if (noteRes) {
+      return Astro.redirect(`/user/${userId}/notes/all`);
+    }
+  }
+  if (text && noteId) {
+    const noteRes = await prisma.notes.upsert({
+      where: {
+        noteId: noteId.toString(),
+      },
+      create: {
+        text: text.toString(),
+        noteId: noteId.toString(),
+        userId,
+      },
+      update: {
+        text: text.toString(),
+      },
+    });
+
+    if (noteRes) {
+      return Astro.redirect(`/user/${userId}/notes/all`);
+    }
+  }
+}
+
+let note = {
+  id: "",
+  userId,
+  text: "",
+  noteId: uuidv4(),
+};
+
+if (noteId !== "all") {
+  const noteRes = await prisma.notes.findFirst({
+    where: {
+      noteId,
+    },
+  });
+
+  if (noteRes) {
+    note = noteRes;
+  }
+}
+
+if (noteId === "all") {
+  const notesResponse = await prisma.notes.findMany({
+    where: {
+      userId,
+    },
+  });
+
+  if (notesResponse) {
+    notes = notesResponse;
+  }
+
+  baseNoteUrl = `/user/${userId}/notes`;
+}
+---
+
+{
+  noteId === "all" && note && (
+    <AllNotes notes={notes} baseNoteUrl={baseNoteUrl} />
+  )
+}
+{noteId !== "all" && note && <NoteComp client:only='react' note={note} />}

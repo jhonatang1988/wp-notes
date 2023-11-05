@@ -1,0 +1,49 @@
+---
+import LoginComp from "../components/Login";
+import Layout from "../layouts/Layout.astro";
+import WpUserClient from "wp-user-client2";
+
+const wpUserClient = new WpUserClient({ env: "dev" });
+const method = Astro.request.method;
+let error = null,
+  userId: string | null = null;
+
+if (method === "POST") {
+  const formData = await Astro.request.formData();
+  const email = formData.get("email");
+  const password = formData.get("password");
+
+  if (!email || !password) {
+    error = "Please enter your email and password";
+  } else {
+    const loginRes = await wpUserClient.login(
+      email.toString(),
+      password.toString()
+    );
+
+    if (loginRes.status === 409) {
+      error = "No user found with that email";
+    } else if (loginRes.status === 401) {
+      error = "Wrong password, please try again";
+    } else if (loginRes.status === 200 && loginRes.token && loginRes.userId) {
+      userId = loginRes.userId;
+
+      Astro.response.headers.set(
+        "Set-Cookie",
+        "jwt=" + loginRes.token + "; Path=/; HttpOnly; SameSite=Strict"
+      );
+    } else {
+      error = "Something went wrong, please try again";
+    }
+  }
+}
+---
+
+<Layout title='Login'>
+  <LoginComp error={error} />
+</Layout>
+<script is:inline define:vars={{ userId }}>
+  if (userId) {
+    window.location.replace(`/user/${userId}/notes/all`);
+  }
+</script>

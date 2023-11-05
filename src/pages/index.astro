@@ -1,0 +1,12 @@
+---
+import Layout from '../layouts/Layout.astro';
+import WpUserClient from 'wp-user-client2'
+import Hello from '../components/Hello';
+
+const wpUserClient = new WpUserClient({ env: 'prod'})
+
+const hello = await wpUserClient.hello()
+---
+<Layout title='Hello'>
+	<Hello hello={hello} />
+</Layout>
